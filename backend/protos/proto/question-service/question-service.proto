@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package question;
+
+option go_package = "danyatalent.question.v1;questionv1";
+
+service Questions {
+  rpc GetQuestion(Empty) returns (QuestionResponse);
+}
+
+message QuestionResponse {
+  string text = 1;
+}
+
+message Empty {};
