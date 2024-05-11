@@ -1,40 +1,43 @@
 package logger
 
 import (
-	"github.com/rs/zerolog"
+	"github.com/phsym/console-slog"
+	"log/slog"
 	"os"
+	"time"
 )
 
 const (
-	envProd        = "prod"
-	envDev         = "dev"
-	envLocal       = "local"
-	skipFrameCount = 3
+	envProd  = "prod"
+	envDev   = "dev"
+	envLocal = "local"
 )
 
-// Logger -.
-type Logger struct {
-	*zerolog.Logger
-}
-
-func InitLogger(env string) *zerolog.Logger {
+func InitLogger(env string) *slog.Logger {
+	var logger *slog.Logger
 	switch env {
 	case envLocal:
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-		out := zerolog.ConsoleWriter{Out: os.Stdout}
-		logger := zerolog.New(out).With().Timestamp().Logger()
-		return &logger
+		logger = slog.New(
+			console.NewHandler(os.Stdout, &console.HandlerOptions{
+				Level:      slog.LevelDebug,
+				TimeFormat: time.TimeOnly,
+			}),
+		)
 	case envDev:
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-		logger := zerolog.New(os.Stdout).With().Timestamp().CallerWithSkipFrameCount(zerolog.CallerSkipFrameCount + skipFrameCount).Logger()
-		return &logger
+		logger = slog.New(
+			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
+		)
 	case envProd:
-		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-		logger := zerolog.New(os.Stdout).With().Timestamp().CallerWithSkipFrameCount(zerolog.CallerSkipFrameCount + skipFrameCount).Logger()
-		return &logger
-	default:
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-		logger := zerolog.New(os.Stdout).With().Timestamp().Logger()
-		return &logger
+		logger = slog.New(
+			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}),
+		)
+	}
+	return logger
+}
+
+func Err(err error) slog.Attr {
+	return slog.Attr{
+		Key:   "error",
+		Value: slog.StringValue(err.Error()),
 	}
 }

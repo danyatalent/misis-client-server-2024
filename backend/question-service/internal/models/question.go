@@ -1,6 +1,9 @@
 package models
 
 type Question struct {
-	Text   string `json:"text"`
-	Answer string `json:"answer"`
+	ID      string
+	Text    string `json:"text" xml:"Question"`
+	Answer  string `json:"answer" xml:"Answer"`
+	Comment string `json:"comment" xml:"Comment"`
+	Author  string `json:"author" xml:"Author"`
 }

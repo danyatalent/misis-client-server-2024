@@ -9,10 +9,11 @@ import (
 
 type (
 	Config struct {
-		App  `yaml:"app"`
-		HTTP `yaml:"http"`
-		Log  `yaml:"logger"`
-		Env  string `yaml:"env" env-required:"true" env-default:"local"`
+		App   `yaml:"app"`
+		HTTP  `yaml:"http"`
+		Log   `yaml:"logger"`
+		Redis `yaml:"redis"`
+		Env   string `yaml:"env" env-required:"true" env-default:"local"`
 	}
 
 	App struct {
@@ -26,6 +27,10 @@ type (
 
 	Log struct {
 		Level string `env-required:"true" yaml:"log_level" env:"LOG_LEVEL"`
+	}
+
+	Redis struct {
+		Addr string `env-required:"true" yaml:"addr" env:"REDIS_ADDR"`
 	}
 )
 
