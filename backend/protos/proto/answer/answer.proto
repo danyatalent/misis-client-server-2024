@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package answer;
+
+message AnswerRequest {
+  string userAnswer = 1;
+  string correctAnswer = 2;
+}
+
+message AnswerResponse {
+  bool isCorrect = 1;
+}
+
+
+service Answer {
+  rpc CheckAnswer(AnswerRequest) returns (AnswerResponse);
+}

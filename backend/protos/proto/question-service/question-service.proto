@@ -10,6 +10,10 @@ service Questions {
 
 message QuestionResponse {
   string text = 1;
+  string answer = 2;
+  string comment = 3;
+  string author = 4;
 }
+
 
 message Empty {};
