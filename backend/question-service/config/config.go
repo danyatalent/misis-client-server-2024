@@ -11,6 +11,7 @@ type (
 	Config struct {
 		App   `yaml:"app"`
 		HTTP  `yaml:"http"`
+		GRPC  `yaml:"grpc"`
 		Log   `yaml:"logger"`
 		Redis `yaml:"redis"`
 		Env   string `yaml:"env" env-required:"true" env-default:"local"`
@@ -23,6 +24,10 @@ type (
 
 	HTTP struct {
 		Port string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+	}
+
+	GRPC struct {
+		Address string `env-required:"true" yaml:"addr" env:"GRPC_ADDRESS"`
 	}
 
 	Log struct {

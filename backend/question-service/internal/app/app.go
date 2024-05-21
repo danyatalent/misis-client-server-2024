@@ -2,10 +2,12 @@ package app
 
 import (
 	"github.com/danyatalent/misis-client-server-2024/backend/question-service/config"
+	grpcapp "github.com/danyatalent/misis-client-server-2024/backend/question-service/internal/app/grpc"
 	v1 "github.com/danyatalent/misis-client-server-2024/backend/question-service/internal/controller/http/v1"
 	"github.com/danyatalent/misis-client-server-2024/backend/question-service/internal/usecase"
 	"github.com/danyatalent/misis-client-server-2024/backend/question-service/internal/usecase/cache"
 	"github.com/danyatalent/misis-client-server-2024/backend/question-service/internal/usecase/webAPI"
+	"github.com/danyatalent/misis-client-server-2024/backend/question-service/pkg/grpcserver"
 	"github.com/danyatalent/misis-client-server-2024/backend/question-service/pkg/httpserver"
 	"github.com/danyatalent/misis-client-server-2024/backend/question-service/pkg/logger"
 	"github.com/danyatalent/misis-client-server-2024/backend/question-service/pkg/redis"
@@ -14,6 +16,10 @@ import (
 	"os/signal"
 	"syscall"
 )
+
+type App struct {
+	GRPCApp *grpcapp.App
+}
 
 func Run(cfg *config.Config) error {
 	l := logger.InitLogger(cfg.Env)
@@ -36,17 +42,33 @@ func Run(cfg *config.Config) error {
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 	l.Info("starting http server on port " + cfg.HTTP.Port)
 
+	// GRPC Server
+	gRPCApp := grpcapp.New(l, questionUseCase)
+	gRPCServer := grpcserver.New(gRPCApp.GRPCServer,
+		grpcserver.Addr(cfg.GRPC.Address),
+	)
+
 	// Waiting signal
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
+	// Graceful Shutdown
 	select {
 	case s := <-interrupt:
 		l.Info("signal: " + s.String())
 	case err = <-httpServer.Notify():
 		l.Error("httpServer.Notify() failed", logger.Err(err))
+	case err = <-gRPCServer.Notify():
+		l.Error("gRPCServer.Notify() failed", logger.Err(err))
 	}
+
 	err = httpServer.Shutdown()
+	if err != nil {
+		l.Error("server shutdown failed", logger.Err(err))
+		return err
+	}
+
+	err = gRPCServer.Shutdown()
 	if err != nil {
 		l.Error("server shutdown failed", logger.Err(err))
 		return err

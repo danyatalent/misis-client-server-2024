@@ -3,6 +3,8 @@ app:
   version: '1.0.0'
 http:
   port: '8080'
+grpc:
+  addr: ':50051'
 logger:
   log_level: 'debug'
 redis:

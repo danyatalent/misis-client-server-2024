@@ -11,7 +11,6 @@ import (
 
 type QuestionService interface {
 	GetRandom(ctx context.Context) (*models.Question, error)
-	Get(ctx context.Context, id string) (*models.Question, error)
 }
 
 type questionRoutes struct {
