@@ -10,7 +10,7 @@ import (
 const (
 	_defaultReadTimeout     = 5 * time.Second
 	_defaultWriteTimeout    = 5 * time.Second
-	_defaultAddr            = "0.0.0.0:80"
+	_defaultAddr            = "0.0.0.0:443"
 	_defaultShutdownTimeout = 3 * time.Second
 )
 
@@ -19,6 +19,8 @@ type Server struct {
 	server          *http.Server
 	notify          chan error
 	shutdownTimeout time.Duration
+	certFile        string
+	keyFile         string
 }
 
 // New -.
@@ -48,7 +50,7 @@ func New(handler http.Handler, opts ...Option) *Server {
 
 func (s *Server) start() {
 	go func() {
-		s.notify <- s.server.ListenAndServe()
+		s.notify <- s.server.ListenAndServeTLS(s.certFile, s.keyFile)
 		close(s.notify)
 	}()
 }

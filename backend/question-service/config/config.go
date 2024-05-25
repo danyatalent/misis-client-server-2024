@@ -23,7 +23,9 @@ type (
 	}
 
 	HTTP struct {
-		Port string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+		Port     string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+		CertFile string `env-required:"true" yaml:"cert_file" env:"HTTP_CERT_FILE"`
+		KeyFile  string `env-required:"true" yaml:"key_file" env:"HTTP_KEY_FILE"`
 	}
 
 	GRPC struct {

@@ -35,3 +35,15 @@ func ShutdownTimeout(timeout time.Duration) Option {
 		s.shutdownTimeout = timeout
 	}
 }
+
+func CertFile(path string) Option {
+	return func(s *Server) {
+		s.certFile = path
+	}
+}
+
+func KeyFile(path string) Option {
+	return func(s *Server) {
+		s.keyFile = path
+	}
+}

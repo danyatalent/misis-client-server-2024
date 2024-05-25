@@ -10,6 +10,9 @@ services:
     environment:
       REDIS_ADDR: redis:6379
       GRPC_CONNECTION: ml-service:50051
+      HTTP_CERT_FILE: /etc/letsencrypt/live/4-gk.ru/fullchain.pem
+      HTTP_KEY_FILE: /etc/letsencrypt/live/4-gk.ru/privkey.pem
+
     volumes:
       - ./config:/root/config
 

@@ -27,9 +27,11 @@ COPY --from=builder /question-service ./
 
 # Copy the config file
 COPY config/config.yaml ./config/config.yaml
+COPY /etc/letsencrypt/live/4-gk.ru/privkey.pem /etc/letsencrypt/live/4-gk.ru/privkey.pem
+COPY /etc/letsencrypt/live/4-gk.ru/fullchain.pem /etc/letsencrypt/live/4-gk.ru/fullchain.pem
 
 
 # Expose port (if your app runs on port 8080 for example)
-EXPOSE 8080
+EXPOSE 443
 
 CMD ["./question-service"]
