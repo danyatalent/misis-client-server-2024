@@ -2,10 +2,11 @@ app:
   name: 'question-service'
   version: '1.0.0'
 http:
-  port: '8080'
+  port: '80'
 grpc:
   addr: ':50052'
   conn_addr:
+
 logger:
   log_level: 'debug'
 env: 'local'

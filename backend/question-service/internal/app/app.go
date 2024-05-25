@@ -31,8 +31,8 @@ func Run(cfg *config.Config) error {
 		webAPI.New(l),
 		cache.New(l, rdb),
 	)
-
 	answerUseCase := usecase.NewAnswer(l, cfg.GRPC.ConnectionAddress)
+
 	// HTTP Server
 	handler := gin.New()
 	v1.NewRouter(handler, l, questionUseCase, answerUseCase)
