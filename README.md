@@ -14,6 +14,9 @@
 
 ### Запуск с помощью docker-compose
 
+Для начала необходимо собрать образ из [данного репозитория](https://github.com/Mihail20052005/testServer) и назвать образ **ml-service**
+
+Затем
 ```bash
 cd backend/question-service && docker-compose up --build
 ```

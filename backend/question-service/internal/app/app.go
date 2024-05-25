@@ -17,10 +17,6 @@ import (
 	"syscall"
 )
 
-type App struct {
-	GRPCApp *grpcapp.App
-}
-
 func Run(cfg *config.Config) error {
 	l := logger.InitLogger(cfg.Env)
 	rdb, err := redis.New(cfg.Redis.Addr)
@@ -30,15 +26,16 @@ func Run(cfg *config.Config) error {
 	}
 	defer rdb.Close()
 
-	questionUseCase := usecase.New(
+	questionUseCase := usecase.NewQuestion(
 		l,
 		webAPI.New(l),
 		cache.New(l, rdb),
 	)
 
+	answerUseCase := usecase.NewAnswer(l, cfg.GRPC.ConnectionAddress)
 	// HTTP Server
 	handler := gin.New()
-	v1.NewRouter(handler, l, questionUseCase)
+	v1.NewRouter(handler, l, questionUseCase, answerUseCase)
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 	l.Info("starting http server on port " + cfg.HTTP.Port)
 

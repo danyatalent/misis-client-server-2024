@@ -15,7 +15,7 @@ type QuestionUseCase struct {
 	cache  QuestionCache
 }
 
-func New(l *slog.Logger, w QuestionWebAPI, c QuestionCache) *QuestionUseCase {
+func NewQuestion(l *slog.Logger, w QuestionWebAPI, c QuestionCache) *QuestionUseCase {
 	return &QuestionUseCase{
 		logger: l,
 		webAPI: w,

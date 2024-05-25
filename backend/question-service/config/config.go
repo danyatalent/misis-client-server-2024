@@ -27,7 +27,8 @@ type (
 	}
 
 	GRPC struct {
-		Address string `env-required:"true" yaml:"addr" env:"GRPC_ADDRESS"`
+		Address           string `env-required:"true" yaml:"addr" env:"GRPC_ADDRESS"`
+		ConnectionAddress string `env-required:"true" yaml:"conn" env:"GRPC_CONNECTION"`
 	}
 
 	Log struct {

@@ -4,7 +4,8 @@ app:
 http:
   port: '8080'
 grpc:
-  addr: ':50051'
+  addr: ':50052'
+  conn_addr:
 logger:
   log_level: 'debug'
 env: 'local'
