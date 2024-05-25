@@ -7,6 +7,4 @@ grpc:
   addr: ':50051'
 logger:
   log_level: 'debug'
-redis:
-  addr: 'localhost:6379'
 env: 'local'
