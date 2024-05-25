@@ -36,7 +36,7 @@ func Run(cfg *config.Config) error {
 	// HTTP Server
 	handler := gin.New()
 	v1.NewRouter(handler, l, questionUseCase, answerUseCase)
-	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
+	httpServer := httpserver.New(handler)
 	l.Info("starting http server on port " + cfg.HTTP.Port)
 
 	// GRPC Server
