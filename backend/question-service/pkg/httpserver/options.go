@@ -11,7 +11,7 @@ type Option func(*Server)
 // Port -.
 func Port(port string) Option {
 	return func(s *Server) {
-		s.server.Addr = net.JoinHostPort("0.0.0.0", port)
+		s.server.Addr = net.JoinHostPort("", port)
 	}
 }
 

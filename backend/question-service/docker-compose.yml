@@ -2,7 +2,7 @@ services:
   question-service:
     build: .
     ports:
-      - "8080:8080"
+      - "80:80"
       - "50052:50052"
     depends_on:
       - redis
@@ -10,8 +10,6 @@ services:
     environment:
       REDIS_ADDR: redis:6379
       GRPC_CONNECTION: ml-service:50051
-      HTTP_CERT_FILE: /etc/letsencrypt/live/4-gk.ru/fullchain.pem
-      HTTP_KEY_FILE: /etc/letsencrypt/live/4-gk.ru/privkey.pem
 
     volumes:
       - ./config:/root/config

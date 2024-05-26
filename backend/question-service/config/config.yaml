@@ -2,12 +2,12 @@ app:
   name: 'question-service'
   version: '1.0.0'
 http:
-  port: '443'
+  port: '80'
   cert_file: ''
   key_file: ''
 grpc:
   addr: ':50052'
-  conn_addr:
+  conn: ''
 
 logger:
   log_level: 'debug'

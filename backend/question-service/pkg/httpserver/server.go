@@ -10,7 +10,8 @@ import (
 const (
 	_defaultReadTimeout     = 5 * time.Second
 	_defaultWriteTimeout    = 5 * time.Second
-	_defaultAddr            = "0.0.0.0:443"
+	_defaultHTTPSAddr       = "0.0.0.0:443"
+	_defaultHTTPAddr        = ":80"
 	_defaultShutdownTimeout = 3 * time.Second
 )
 
@@ -29,7 +30,7 @@ func New(handler http.Handler, opts ...Option) *Server {
 		Handler:      handler,
 		ReadTimeout:  _defaultReadTimeout,
 		WriteTimeout: _defaultWriteTimeout,
-		Addr:         _defaultAddr,
+		Addr:         _defaultHTTPAddr,
 	}
 
 	s := &Server{
@@ -43,14 +44,19 @@ func New(handler http.Handler, opts ...Option) *Server {
 		opt(s)
 	}
 
-	s.start()
-
 	return s
 }
 
-func (s *Server) start() {
+func (s *Server) StartHTTPS() {
 	go func() {
 		s.notify <- s.server.ListenAndServeTLS(s.certFile, s.keyFile)
+		close(s.notify)
+	}()
+}
+
+func (s *Server) Start() {
+	go func() {
+		s.notify <- s.server.ListenAndServe()
 		close(s.notify)
 	}()
 }
