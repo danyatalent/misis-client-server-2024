@@ -50,6 +50,7 @@ POST https::/4-gk.ru/api/v1/answer/check
 * ~~[Реализовать сервис обработки ответов](https://github.com/Mihail20052005/testServer)~~
 * Добавить Swagger документацию
 * Добавить тесты
+* Добавить БД и настроить сохранение вопросов туда
 * Настроить CI/CD
 * Реализовать [полноценный фронтенд для смартаппа](https://github.com/MatveyMakhrov/module-for-SBER/)
 
