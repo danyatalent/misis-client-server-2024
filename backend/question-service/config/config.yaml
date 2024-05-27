@@ -7,7 +7,9 @@ http:
   key_file: ''
 grpc:
   addr: ':50052'
-  conn: ''
+  conn: ':50051'
+redis:
+  addr: ':6379'
 
 logger:
   log_level: 'debug'
