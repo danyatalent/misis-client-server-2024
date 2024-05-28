@@ -2,7 +2,7 @@ app:
   name: 'question-service'
   version: '1.0.0'
 http:
-  port: '80'
+  port: '8080'
   cert_file: ''
   key_file: ''
 grpc:
