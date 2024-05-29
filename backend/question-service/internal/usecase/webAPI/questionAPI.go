@@ -7,10 +7,14 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"strings"
 )
 
 const (
-	URL = "https://db.chgk.info/xml/random/types1/complexity2"
+	URL            = "https://db.chgk.info/xml/random/types1/complexity2"
+	picPrefix      = "pic:"
+	razdatkaPrefix = "<раздатка>"
+	hostPrefix     = "ведущему:"
 )
 
 type QuestionWebAPI struct {
@@ -82,9 +86,16 @@ func (w *QuestionWebAPI) GetAllQuestions() ([]*models.Question, error) {
 		w.logger.Error("error unmarshalling data")
 		return nil, fmt.Errorf("error unmarshalling data: %w", err)
 	}
-	questions := make([]*models.Question, len(search.Questions))
-	for i, q := range search.Questions {
-		questions[i] = toDomain(&q)
+	questions := make([]*models.Question, 0)
+	for _, q := range search.Questions {
+		if !strings.Contains(q.Question, picPrefix) && !strings.Contains(q.Question, razdatkaPrefix) && !strings.Contains(strings.ToLower(q.Question), hostPrefix) {
+			domainQuestion := toDomain(&q)
+			questions = append(questions, domainQuestion)
+			if domainQuestion.Text == "" {
+				w.logger.Error("domain question is empty")
+			}
+			//w.logger.Info("question", domainQuestion)
+		}
 	}
 	return questions, nil
 }

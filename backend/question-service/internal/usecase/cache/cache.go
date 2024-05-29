@@ -11,10 +11,11 @@ import (
 	"github.com/danyatalent/misis-client-server-2024/backend/question-service/pkg/redis"
 	"log/slog"
 	"sync"
+	"time"
 )
 
 const (
-	cachePrefix = "question"
+	cacheStackKey = "questions"
 )
 
 type QuestionCache struct {
@@ -23,7 +24,7 @@ type QuestionCache struct {
 	mu sync.Mutex
 }
 
-func (c *QuestionCache) Put(ctx context.Context, id string, value *models.Question) error {
+func (c *QuestionCache) Put(ctx context.Context, value *models.Question) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -38,48 +39,54 @@ func (c *QuestionCache) Put(ctx context.Context, id string, value *models.Questi
 		return fmt.Errorf("error marshalling to json: %w", err)
 	}
 
-	key := fmt.Sprintf("%s:%s", cachePrefix, id)
+	//key := fmt.Sprintf("%s:%s", cachePrefix, id)
 
 	// Using our cache struct to save
-	err = c.Client.Set(ctx, key, encodedQuestion, 0).Err()
+	//err = c.Client.Set(ctx, key, encodedQuestion, 0).Err()
+	err = c.Client.LPush(ctx, cacheStackKey, encodedQuestion).Err()
 	if err != nil {
 		c.logger.Error("error put in cache", logger.Err(err))
 		return fmt.Errorf("error put in cache: %w", err)
 	}
+	err = c.Client.Expire(ctx, cacheStackKey, time.Hour).Err()
+	if err != nil {
+		c.logger.Error("error setting expire for stack in cache", logger.Err(err))
+		return fmt.Errorf("error setting expire for stack in cache: %w", err)
+	}
 	return nil
 }
 
-func (c *QuestionCache) Get(ctx context.Context, id string) (*models.Question, error) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	// Enhancing logger
-	const op = "QuestionCache.Get"
-	c.logger = c.logger.With(op)
-
-	key := fmt.Sprintf("%s:%s", cachePrefix, id)
-
-	// Using our cache to get the model
-	encodedQuestion, err := c.Client.Get(ctx, key).Result()
-	if errors.Is(err, redis.Nil) {
-		c.logger.Error("error key not exists in cache", logger.Err(err))
-		return nil, apperror.ErrQuestionNotFound
-	} else if err != nil {
-		c.logger.Error("error getting from redis", logger.Err(err))
-		return nil, fmt.Errorf("error getting from redis: %w", err)
-	}
-
-	question := &models.Question{}
-
-	// Unmarshalling from JSON
-	err = json.Unmarshal([]byte(encodedQuestion), question)
-	if err != nil {
-		c.logger.Error("error unmarshalling from json", logger.Err(err))
-		return nil, fmt.Errorf("error unmarshalling from json: %w", err)
-	}
-
-	return question, nil
-}
+//func (c *QuestionCache) Get(ctx context.Context, id string) (*models.Question, error) {
+//	c.mu.Lock()
+//	defer c.mu.Unlock()
+//
+//	// Enhancing logger
+//	const op = "QuestionCache.Get"
+//	c.logger = c.logger.With(op)
+//
+//	key := fmt.Sprintf("%s:%s", cachePrefix, id)
+//
+//	// Using our cache to get the model
+//	encodedQuestion, err := c.Client.Get(ctx, key).Result()
+//	if errors.Is(err, redis.Nil) {
+//		c.logger.Error("error key not exists in cache", logger.Err(err))
+//		return nil, apperror.ErrQuestionNotFound
+//	} else if err != nil {
+//		c.logger.Error("error getting from redis", logger.Err(err))
+//		return nil, fmt.Errorf("error getting from redis: %w", err)
+//	}
+//
+//	question := &models.Question{}
+//
+//	// Unmarshalling from JSON
+//	err = json.Unmarshal([]byte(encodedQuestion), question)
+//	if err != nil {
+//		c.logger.Error("error unmarshalling from json", logger.Err(err))
+//		return nil, fmt.Errorf("error unmarshalling from json: %w", err)
+//	}
+//
+//	return question, nil
+//}
 
 func (c *QuestionCache) GetRandom(ctx context.Context) (*models.Question, error) {
 	c.mu.Lock()
@@ -88,18 +95,23 @@ func (c *QuestionCache) GetRandom(ctx context.Context) (*models.Question, error)
 	const op = "QuestionCache.GetRandom"
 	c.logger = c.logger.With(op)
 
-	randomKey, err := c.Client.RandomKey(ctx).Result()
-	if err != nil {
-		if errors.Is(err, redis.Nil) {
-			return nil, apperror.ErrQuestionNotFound
-		}
-		c.logger.Error("error getting random key from redis", logger.Err(err))
-		return nil, fmt.Errorf("error getting random key from redis: %w", err)
-	}
+	//randomKey, err := c.Client.RandomKey(ctx).Result()
+	//if err != nil {
+	//	if errors.Is(err, redis.Nil) {
+	//		return nil, apperror.ErrQuestionNotFound
+	//	}
+	//	c.logger.Error("error getting random key from redis", logger.Err(err))
+	//	return nil, fmt.Errorf("error getting random key from redis: %w", err)
+	//}
+
 	question := &models.Question{}
 
-	rawJSON, err := c.Client.Get(ctx, randomKey).Result()
+	rawJSON, err := c.Client.RPop(ctx, cacheStackKey).Result()
 	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			c.logger.Error("question stack is empty", logger.Err(err))
+			return nil, apperror.ErrQuestionNotFound
+		}
 		c.logger.Error("error getting from redis", logger.Err(err))
 		return nil, fmt.Errorf("error getting from redis: %w", err)
 	}

@@ -13,7 +13,6 @@ type QuestionWebAPI interface {
 
 //go:generate go run github.com/vektra/mockery/v2@v2.28.2 --name=Cache
 type QuestionCache interface {
-	Put(ctx context.Context, key string, value *models.Question) error
-	Get(ctx context.Context, key string) (*models.Question, error)
+	Put(ctx context.Context, value *models.Question) error
 	GetRandom(ctx context.Context) (*models.Question, error)
 }
